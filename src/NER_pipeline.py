@@ -1,9 +1,13 @@
-import pandas as pd
 from enum import Enum
+
+import pandas as pd
+from seqeval.metrics import classification_report, f1_score
 
 from src.utils.dataset_parser import parse_dataset
 from src.EDA.EDA import create_plots
 from src.preprocessing.preprocessing import remove_punctuation
+from src.models.rule_based_approach import Rulse_based_model
+from src.utils.dataset_parser import get_entities
 
 
 class Preprocessor(Enum):
@@ -66,7 +70,7 @@ class NER_pipeline:
 
     def run(self) -> None:
         self.preprocess()
-        self.train()
+        # self.train()
         self.eval()
 
 
@@ -79,13 +83,18 @@ class NER_pipeline:
         if self._preprocessor == Preprocessor.REMOVE_PUNCTUATION:
             self._train_dataset = remove_punctuation(self._train_dataset)
 
-
+        
     def train(self) -> None:
-        return
-
+        if self._algorithm == Algorithm.RULE_BASED:
+            pass
 
     def eval(self) -> None:
-        return
+        model = Rulse_based_model("checkpoint")
+        res = model.predict(self._test_dataset)
+        res_true = self._test_dataset["Tags"]
+
+        print(classification_report(res, res_true))
+        print(f"f1-score: {f1_score(res, res_true)}")
     
 
     def str2enum(self, target: str) -> Algorithm:

@@ -24,6 +24,29 @@ def parse_dataset(file_name: str, columns=["Sentence", "Tags"]) -> pd.DataFrame:
 
     return df
 
+    
+def get_entities(tags_list):
+    entities_list = []
+    for tags in tags_list:
+        entities = []
+        start, end, entity = None, None, None
+        for i, tag in enumerate(tags):
+            if tag.startswith("B-"):
+                if entity:
+                    entities.append((start, end, entity))
+                start, end, entity = i, i + 1, tag[2:]
+            elif tag.startswith("I-") and entity == tag[2:]:
+                end = i + 1
+            else:
+                if entity:
+                    entities.append((start, end, entity))
+                    start, end, entity = None, None, None
+        if entity:
+            entities.append((start, end, entity))
+            print(entities)
+        entities_list.append(entities)
+    return entities_list
+
 
 if __name__ == "__main__":
     parse_file("dataset/train.conllu")
