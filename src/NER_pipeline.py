@@ -75,7 +75,6 @@ class NER_pipeline:
 
 
     def preprocess(self) -> None:
-
         # crete plots
         create_plots([self._train_dataset, self._test_dataset, self._val_dataset], ["train", "test", "val"])
 
@@ -87,15 +86,22 @@ class NER_pipeline:
     def train(self) -> None:
         if self._algorithm == Algorithm.RULE_BASED:
             pass
+        else:
+            raise RuntimeError(f"Algorithms doesn't supported yet")
 
     def eval(self) -> None:
-        model = Rulse_based_model("checkpoint")
-        res = model.predict(self._test_dataset)
-        res_true = self._test_dataset["Tags"]
+        if self._algorithm == Algorithm.RULE_BASED:
+            model = Rulse_based_model()
+            # model.fit(self._train_dataset["Sentence"], self._train_dataset["Tags"])
+            # print(len(self._test_dataset))
+            res = model.predict(self._test_dataset)
+            print(self._test_dataset[:10])
+            res_true = self._test_dataset["Tags"]
 
-        print(classification_report(res, res_true))
-        print(f"f1-score: {f1_score(res, res_true)}")
-    
+            print(classification_report(res, res_true))
+            print(f"f1-score: {f1_score(res, res_true)}")
+        else:
+            raise RuntimeError(f"Algorithms doesn't supported yet")
 
     def str2enum(self, target: str) -> Algorithm:
         try:
