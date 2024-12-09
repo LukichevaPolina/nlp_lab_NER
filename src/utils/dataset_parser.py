@@ -1,9 +1,10 @@
 import pandas as pd
 
+
 def parse_file(file_name: str) -> list:
     with open(file_name, 'r') as file:
-        lines = [line.rstrip() for line in file][:-1] # last string is empty
-    
+        lines = [line.rstrip() for line in file][:-1]  # last string is empty
+
     data, sentence, tags = [], [], []
 
     for line in lines:
@@ -16,7 +17,7 @@ def parse_file(file_name: str) -> list:
             tags.append(current_line[2])
 
     return data
-    
+
 
 def parse_dataset(file_name: str, columns=["Sentence", "Tags"]) -> pd.DataFrame:
     data_list = parse_file(file_name)
@@ -24,7 +25,7 @@ def parse_dataset(file_name: str, columns=["Sentence", "Tags"]) -> pd.DataFrame:
 
     return df
 
-    
+
 def get_entities(tags_list):
     entities_list = []
     for tags in tags_list:

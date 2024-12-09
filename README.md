@@ -52,32 +52,52 @@ Consider removing any unnecessary punctuation marks or special characters unless
 
 ## Rule based models
 ### Using Spacy model
+Spacy model returns more tags then we need:
+PERSON:      People, including fictional.
+NORP:        Nationalities or religious or political groups.
+FAC:         Buildings, airports, highways, bridges, etc.
+ORG:         Companies, agencies, institutions, etc.
+GPE:         Countries, cities, states.
+LOC:         Non-GPE locations, mountain ranges, bodies of water.
+PRODUCT:     Objects, vehicles, foods, etc. (Not services.)
+EVENT:       Named hurricanes, battles, wars, sports events, etc.
+WORK_OF_ART: Titles of books, songs, etc.
+LAW:         Named documents made into laws.
+LANGUAGE:    Any named language.
+DATE:        Absolute or relative dates or periods.
+TIME:        Times smaller than a day.
+PERCENT:     Percentage, including ”%“.
+MONEY:       Monetary values, including unit.
+QUANTITY:    Measurements, as of weight or distance.
+ORDINAL:     “first”, “second”, etc.
+CARDINAL:    Numerals that do not fall under another type.  
+
+We decided to calculate the most popular target tag for every spacy tag and then map them. This allows us to achieve following results: 
 |             | precision |   recall | f1-score |  support |
 |--------     | --------  | -------- | -------- |  ------- | 
-|         LOC |     0.56  |    0.70  |    0.62  |   15925  |
-|        MISC |     0.16  |    0.73  |    0.27  |   83014  |
-|         ORG |     0.41  |    0.31  |    0.35  |   27299  |
-|         PER |     0.68  |    0.67  |    0.67  |    5226  |
+|         LOC |     0.58  |    0.68  |    0.63  |   5056   |
+|        MISC |     0.41  |    0.61  |    0.49  |   3359   |
+|         ORG |     0.17  |    0.28  |    0.21  |   2022   |
+|         PER |     0.68  |    0.67  |    0.67  |   5226   |
 |             |           |          |          |          |  
-|   micro avg |     0.46  |    0.58  |    0.51  |  131464  |
-|   macro avg |     0.45  |    0.60  |    0.48  |  131464  |
-|weighted avg |     0.52  |    0.58  |    0.53  |  131464  |
+|   micro avg |     0.49  |    0.61  |    0.54  |  15663   |
+|   macro avg |     0.46  |    0.56  |    0.50  |  15663   |
+|weighted avg |     0.52  |    0.61  |    0.56  |  15663   |
 
-**f1-score:** 0.5130712489048413
+**f1-score:** 0.5433398420918584
 
 ### Add custom rules
-* Adding all tags from train dataset
-|             | precision |   recall | f1-score |  support |
-|--------     | --------  | -------- | -------- |  ------- | 
-|         LOC |     0.56  |    0.21  |    0.30  |   15925  |
-|        MISC |     0.17  |    0.01  |    0.02  |   83014  |
-|         ORG |     0.41  |    0.05  |    0.09  |   27299  |
-|         PER |     0.68  |    0.67  |    0.67  |    5226  |
-|             |           |          |          |          |  
-|   micro avg |     0.46  |    0.07  |    0.12  |  131464  |
-|   macro avg |     0.45  |    0.24  |    0.27  |  131464  |
-|weighted avg |     0.29  |    0.07  |    0.10  |  131464  |
+* Dummy way - adding all tags from train dataset
+              precision    recall  f1-score   support
 
-**f1-score:** 0.12061824293030213
+         LOC       0.56      0.68      0.61      4836
+        MISC       0.41      0.61      0.49      3359
+         ORG       0.17      0.28      0.21      2022
+         PER       0.68      0.67      0.67      5226
 
+   micro avg       0.48      0.61      0.54     15443
+   macro avg       0.45      0.56      0.50     15443
+weighted avg       0.51      0.61      0.55     15443
+
+f1-score: 0.5385995386849673
 * Add popular words from train dataset
