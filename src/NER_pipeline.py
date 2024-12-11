@@ -5,7 +5,7 @@ from seqeval.metrics import classification_report, f1_score
 
 from src.utils.dataset_parser import parse_dataset
 from src.EDA.EDA import create_plots
-from src.preprocessing.preprocessing import remove_punctuation, stemming
+from src.preprocessing.preprocessing import remove_punctuation, lemamtization
 from src.models.rule_based_approach import Rulse_based_model
 from src.utils.dataset_parser import get_entities
 
@@ -88,9 +88,9 @@ class NER_pipeline:
             self._val_dataset = remove_punctuation(self._val_dataset)
 
         if self._algorithm == Algorithm.NN:
-            self._train_dataset = stemming(self._train_dataset)
-            self._test_dataset = stemming(self._test_dataset)
-            self._val_dataset = stemming(self._val_dataset)
+            self._train_dataset = lemamtization(self._train_dataset)
+            self._test_dataset = lemamtization(self._test_dataset)
+            self._val_dataset = lemamtization(self._val_dataset)
 
     def train(self) -> None:
         if self._algorithm == Algorithm.RULE_BASED:

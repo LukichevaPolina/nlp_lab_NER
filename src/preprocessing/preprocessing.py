@@ -22,11 +22,10 @@ def remove_punctuation(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def stemming(data: pd.DataFrame) -> pd.DataFrame:
+def lemamtization(data: pd.DataFrame) -> pd.DataFrame:
     lemmer = WordNetLemmatizer()
     data["Sentence"] = data["Sentence"].map(
         lambda x: [lemmer.lemmatize(item) for item in x])
-    print(data["Sentence"])
     return data
 
 
