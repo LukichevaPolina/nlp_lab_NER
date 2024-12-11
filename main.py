@@ -45,16 +45,16 @@ def parse_args() -> Dict[str, str]:
     args.add_argument(
         "--preprocessor",
         type=str,
-        default="none",
+        default="prepoc-none",
         # TODO: replace-capital-letters - ?
-        choices=["none", "remove-punctuation"],
+        choices=["prepoc-none", "remove-punctuation"],
         help="the strategy to do preprocess"
     )
     args.add_argument(
         "--embedder",
-        required=True,
         type=str,
-        choices=["word2vec-onehot", "word2vec-onehot"],
+        default="emb-none",
+        choices=["emb-none", "word2vec-onehot", "word2vec-onehot"],
         help="the strategy to do preprocess"
     )
     args.add_argument(
