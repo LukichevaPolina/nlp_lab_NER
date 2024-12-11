@@ -1,6 +1,7 @@
 from string import punctuation
 
 import pandas as pd
+from nltk.stem import PorterStemmer
 
 
 # TODO: fix bug
@@ -9,7 +10,7 @@ def remove_punctuation(data: pd.DataFrame) -> pd.DataFrame:
     for row_idx, row in enumerate(data.itertuples()):
         sentence = ""
         tags = []
-        for idx, token in enumerate(row.Sentence.split()):
+        for idx, token in enumerate(row.Sentence):
             if token not in punctuations_str:
                 sentence += token + " "
                 tags.append(row.Tags[idx])
@@ -20,9 +21,12 @@ def remove_punctuation(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-# TODO: implement embedders
-def get_embedings(data: pd.DataFrame):
-    pass
+def stemming(data: pd.DataFrame) -> pd.DataFrame:
+    stemmer = PorterStemmer()
+    data["Sentence"] = data["Sentence"].map(
+        lambda x: [stemmer.stem(item) for item in x])
+
+    return data
 
 
 def prepare_spacy_data(df: pd.date_range) -> list:
