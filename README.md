@@ -79,7 +79,7 @@ We decided to calculate the most popular target tag for every spacy tag and then
 |        MISC |     0.41  |    0.61  |    0.49  |   3359   |
 |         ORG |     0.17  |    0.28  |    0.21  |   2022   |
 |         PER |     0.68  |    0.67  |    0.67  |   5226   |
-|             |           |          |          |          |  
+|   --------  | --------  |  ------  | ------   |  ------  |
 |   micro avg |     0.49  |    0.61  |    0.54  |  15663   |
 |   macro avg |     0.46  |    0.56  |    0.50  |  15663   |
 |weighted avg |     0.52  |    0.61  |    0.56  |  15663   |
@@ -99,5 +99,5 @@ We decided to calculate the most popular target tag for every spacy tag and then
    macro avg       0.45      0.56      0.50     15443
 weighted avg       0.51      0.61      0.55     15443
 
-f1-score: 0.5385995386849673
+*f1-score:* 0.5385995386849673
 * Add popular words from train dataset

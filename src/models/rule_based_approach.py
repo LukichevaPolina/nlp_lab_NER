@@ -28,7 +28,7 @@ class Rulse_based_model:
             res_list.append(tags_list)
         return res_list
 
-    def _match_tags(self, doc_pred_list, tags_true_list):
+    def _match_tags(self, doc_pred_list: list, tags_true_list: list) -> dict:
         # get dict with the most popular target tag for spacy tags
         target_values = {"O": 0, "B-MISC": 0, "I-MISC": 0, "B-PER": 0,
                          "I-PER": 0, "B-LOC": 0, "I-LOC": 0, "B-ORG": 0, "I-ORG": 0, }
@@ -48,16 +48,15 @@ class Rulse_based_model:
 
         return res_dict
 
-    def _spacy_pred(self, X):
+    def _spacy_pred(self, X) -> list:
         res_list = []
         for idx, sentence in enumerate(X):
             doc = self._nlp(Doc(self._nlp.vocab, words=sentence))
             res_list.append(doc)
 
         return res_list
-    
 
-    def _add_custom_rules(self, X, y):
+    def _add_custom_rules(self, X, y) -> None:
         ruler = self._nlp.add_pipe("entity_ruler")
         locations = set()
         organizations = set()
@@ -74,14 +73,17 @@ class Rulse_based_model:
                 elif tag == "B-PER" or tag == "I-PER":
                     persons.add(sentance[idx])
 
-        patterns = [{"label": "LOC", "pattern": [{"LOWER": loc}]} for loc in locations]
-        patterns += [{"label": "ORG", "pattern": [{"LOWER": org}]} for org in organizations]
-        patterns += [{"label": "MISC", "pattern": [{"LOWER": misc}]} for misc in misc_entities]
-        patterns += [{"label": "PER", "pattern": [{"LOWER": per}]} for per in persons]
+        patterns = [{"label": "LOC", "pattern": [{"LOWER": loc}]}
+                    for loc in locations]
+        patterns += [{"label": "ORG", "pattern": [{"LOWER": org}]}
+                     for org in organizations]
+        patterns += [{"label": "MISC", "pattern": [{"LOWER": misc}]}
+                     for misc in misc_entities]
+        patterns += [{"label": "PER", "pattern": [{"LOWER": per}]}
+                     for per in persons]
         ruler.add_patterns(patterns)
 
-
-    def fit(self, X, y):
+    def fit(self, X, y) -> None:
         if self._is_use_custom_rules:
             self._add_custom_rules(X, y)
         res_list = self._spacy_pred(X)

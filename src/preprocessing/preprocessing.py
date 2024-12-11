@@ -1,15 +1,17 @@
 from string import punctuation
 
 import pandas as pd
-
+from nltk.stem import WordNetLemmatizer
 
 # TODO: fix bug
+
+
 def remove_punctuation(data: pd.DataFrame) -> pd.DataFrame:
     punctuations_str = punctuation
     for row_idx, row in enumerate(data.itertuples()):
         sentence = ""
         tags = []
-        for idx, token in enumerate(row.Sentence.split()):
+        for idx, token in enumerate(row.Sentence):
             if token not in punctuations_str:
                 sentence += token + " "
                 tags.append(row.Tags[idx])
@@ -20,9 +22,12 @@ def remove_punctuation(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-# TODO: implement embedders
-def get_embedings(data: pd.DataFrame):
-    pass
+def stemming(data: pd.DataFrame) -> pd.DataFrame:
+    lemmer = WordNetLemmatizer()
+    data["Sentence"] = data["Sentence"].map(
+        lambda x: [lemmer.lemmatize(item) for item in x])
+    print(data["Sentence"])
+    return data
 
 
 def prepare_spacy_data(df: pd.date_range) -> list:
