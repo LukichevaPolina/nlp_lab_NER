@@ -101,4 +101,4 @@ Custom rules - addind popular oragizations, names, surnames to rules. It changes
 |   macro avg |     0.46  |    0.57  |    0.51  |   126877 |
 |weighted avg |     0.52  |    0.63  |    0.57  |   126877 |
 
-f1-score: 0.5554045698596066
+**f1-score:** 0.5554045698596066
