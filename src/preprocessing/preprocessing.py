@@ -7,11 +7,11 @@ from nltk.stem import WordNetLemmatizer
 def remove_punctuation(data: pd.DataFrame) -> pd.DataFrame:
     punctuations_str = punctuation
     for row_idx, row in enumerate(data.itertuples()):
-        sentence = ""
+        sentence = []
         tags = []
         for idx, token in enumerate(row.Sentence):
             if token not in punctuations_str:
-                sentence += token + " "
+                sentence.append(token) 
                 tags.append(row.Tags[idx])
 
         data.loc[row_idx, "Sentence"] = sentence
