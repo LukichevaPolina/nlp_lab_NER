@@ -81,7 +81,7 @@ We decided to calculate the most popular target tag for every spacy tag and then
 |        MISC |     0.41  |    0.61  |    0.49  |   3359   |
 |         ORG |     0.17  |    0.28  |    0.21  |   2022   |
 |         PER |     0.68  |    0.67  |    0.67  |   5226   |
-|   --------  | --------  |  ------  | ------   |  ------  |
+|             |           |          |          |          |
 |   micro avg |     0.49  |    0.61  |    0.54  |  15663   |
 |   macro avg |     0.46  |    0.56  |    0.50  |  15663   |
 |weighted avg |     0.52  |    0.61  |    0.56  |  15663   |
@@ -89,16 +89,16 @@ We decided to calculate the most popular target tag for every spacy tag and then
 **f1-score:** 0.5433398420918584
 
 ### Add custom rules
-* Custom rules - addind popular oragizations, names, surnames to rules. It changes f1-score marginally.
-|             | precision  |  recall | f1-score  | support |
-|--------     | --------   | ------- | --------  |  ------ |
-|         LOC |      0.57  |    0.72 |     0.63  |   43702 |
-|        MISC |      0.42  |    0.63 |     0.50  |   26692 |
-|         ORG |      0.19  |    0.30 |     0.23  |   15629 |
-|         PER |      0.67  |    0.66 |     0.66  |   40854 |
-|   --------  | --------   |  ------ | ------    |  ------ |
-|   micro avg |      0.50  |    0.63 |     0.56  |  126877 |
-|   macro avg |      0.46  |    0.57 |     0.51  |  126877 |
-|weighted avg |      0.52  |    0.63 |     0.57  |  126877 |
+Custom rules - addind popular oragizations, names, surnames to rules. It changes f1-score marginally.
+|             | precision |   recall | f1-score |  support |
+|--------     | --------  | -------- | -------- |  ------- | 
+|         LOC |     0.57  |    0.72  |    0.63  |    43702 |
+|        MISC |     0.42  |    0.63  |    0.50  |    26692 |
+|         ORG |     0.19  |    0.30  |    0.23  |    15629 |
+|         PER |     0.67  |    0.66  |    0.66  |    40854 |
+|             |           |          |          |          |
+|   micro avg |     0.50  |    0.63  |    0.56  |   126877 |
+|   macro avg |     0.46  |    0.57  |    0.51  |   126877 |
+|weighted avg |     0.52  |    0.63  |    0.57  |   126877 |
 
 f1-score: 0.5554045698596066
