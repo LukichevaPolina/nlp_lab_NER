@@ -1,30 +1,31 @@
 from enum import Enum
 
 import pandas as pd
+
 from seqeval.metrics import classification_report, f1_score
 
 from src.utils.dataset_parser import parse_dataset
-from src.EDA.EDA import create_plots
-from src.preprocessing.preprocessing import remove_punctuation, remove_whitespaces, lemamtization
-from src.models.rule_based_approach import Rulse_based_model
-from src.utils.dataset_parser import get_entities
 
+from src.EDA.EDA import create_plots
+
+from src.preprocessing.preprocessing import remove_punctuation, remove_whitespaces, lemamtization
+
+from src.models.rule_based_approach import Rulse_based_model
+
+from src.utils.dataset_parser import get_entities
 
 class Preprocessor(Enum):
     NONE = 1
     REMOVE_PUNCTUATION = 2
 
-
 class Algorithm(Enum):
     RULE_BASED = 1
     NN = 2
-
 
 class Mode(Enum):
     TRAIN = 1
     EVAL = 2
     INFER = 3
-
 
 TARGET2ENUM = {
     "rule-based": Algorithm.RULE_BASED,
@@ -32,15 +33,12 @@ TARGET2ENUM = {
     "prepoc-none": Preprocessor.NONE,
     "remove-punctuation": Preprocessor.REMOVE_PUNCTUATION,
     "remove-whitespaces": Preprocessor.REMOVE_WHITESPACES,
-    "remove-all": Preprocessor.REMOVE_ALL,
     "train": Mode.TRAIN,
     "eval": Mode.EVAL,
     "infer": Mode.INFER
 }
 
-
 ENUM2TARGET = dict(zip(TARGET2ENUM.values(), TARGET2ENUM.keys()))
-
 
 class NER_pipeline:
     def __init__(self,
