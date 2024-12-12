@@ -47,7 +47,8 @@ def parse_args() -> Dict[str, str]:
         type=str,
         default="prepoc-none",
         # TODO: replace-capital-letters - ?
-        choices=["prepoc-none", "remove-punctuation"],
+        choices=["prepoc-none", "remove-punctuation",
+                 "remove-whitespaces", "remove-all"],
         help="the strategy to do preprocess"
     )
     args.add_argument(
