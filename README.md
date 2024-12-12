@@ -41,10 +41,64 @@ Dataset contains 3 files:
 ![alt text](./plots/tags_distribution_train_O_tag_False.png) | ![alt text](./plots/tags_distribution_test_O_tag_False.png) | ![alt text](./plots/tags_distribution_val_O_tag_False.png)
 
 
-| Train | Test | Val |
-:---------------:|:--------------:|:---------:
-![alt text](./plots/tag_word_position_distribution_train.png) | ![alt text](./plots/tag_word_position_distribution_test.png) | ![alt text](./plots/tag_word_position_distribution_val.png)
-
+Train:
+![alt text](./plots/tag_word_position_distribution_train.png)
+Test:
+![alt text](./plots/tag_word_position_distribution_test.png)
+Val:
+![alt text](./plots/tag_word_position_distribution_val.png)
 
 ## Preprocessing
 Consider removing any unnecessary punctuation marks or special characters unless they carry significant meaning in certain languages.
+
+
+## Rule based models
+### Using Spacy model
+Spacy model returns more tags then we need:
+PERSON:      People, including fictional.
+NORP:        Nationalities or religious or political groups.
+FAC:         Buildings, airports, highways, bridges, etc.
+ORG:         Companies, agencies, institutions, etc.
+GPE:         Countries, cities, states.
+LOC:         Non-GPE locations, mountain ranges, bodies of water.
+PRODUCT:     Objects, vehicles, foods, etc. (Not services.)
+EVENT:       Named hurricanes, battles, wars, sports events, etc.
+WORK_OF_ART: Titles of books, songs, etc.
+LAW:         Named documents made into laws.
+LANGUAGE:    Any named language.
+DATE:        Absolute or relative dates or periods.
+TIME:        Times smaller than a day.
+PERCENT:     Percentage, including ”%“.
+MONEY:       Monetary values, including unit.
+QUANTITY:    Measurements, as of weight or distance.
+ORDINAL:     “first”, “second”, etc.
+CARDINAL:    Numerals that do not fall under another type.  
+
+We decided to calculate the most popular target tag for every spacy tag and then map them. This allows us to achieve following results: 
+|             | precision |   recall | f1-score |  support |
+|--------     | --------  | -------- | -------- |  ------- | 
+|         LOC |     0.58  |    0.68  |    0.63  |   5056   |
+|        MISC |     0.41  |    0.61  |    0.49  |   3359   |
+|         ORG |     0.17  |    0.28  |    0.21  |   2022   |
+|         PER |     0.68  |    0.67  |    0.67  |   5226   |
+|   --------  | --------  |  ------  | ------   |  ------  |
+|   micro avg |     0.49  |    0.61  |    0.54  |  15663   |
+|   macro avg |     0.46  |    0.56  |    0.50  |  15663   |
+|weighted avg |     0.52  |    0.61  |    0.56  |  15663   |
+
+**f1-score:** 0.5433398420918584
+
+### Add custom rules
+* Custom rules - addind popular oragizations, names, surnames to rules. It changes f1-score marginally.
+|             | precision  |  recall | f1-score  | support |
+|--------     | --------   | ------- | --------  |  ------ |
+|         LOC |      0.57  |    0.72 |     0.63  |   43702 |
+|        MISC |      0.42  |    0.63 |     0.50  |   26692 |
+|         ORG |      0.19  |    0.30 |     0.23  |   15629 |
+|         PER |      0.67  |    0.66 |     0.66  |   40854 |
+|   --------  | --------   |  ------ | ------    |  ------ |
+|   micro avg |      0.50  |    0.63 |     0.56  |  126877 |
+|   macro avg |      0.46  |    0.57 |     0.51  |  126877 |
+|weighted avg |      0.52  |    0.63 |     0.57  |  126877 |
+
+f1-score: 0.5554045698596066
