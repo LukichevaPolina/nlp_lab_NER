@@ -1,0 +1,6 @@
+matplotlib==3.9.3
+nltk==3.9.1
+pandas==2.2.3
+seqeval==1.2.2
+spacy==3.8.2
+tqdm==4.66.5
