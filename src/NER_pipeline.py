@@ -98,12 +98,12 @@ class NER_pipeline:
             self.model.fit(
                 self._train_dataset["Sentence"], self._train_dataset["Tags"])
         else:
-            raise RuntimeError(f"Algorithms doesn't supported yet")
+            raise RuntimeError(f"Algorithm doesn't supported yet")
 
     def eval(self) -> None:
         if self._algorithm == Algorithm.RULE_BASED:
-            res = self.model.predict(self._test_dataset["Sentence"])
-            res_true = self._test_dataset["Tags"]
+            res = self.model.predict(self._train_dataset["Sentence"])
+            res_true = self._train_dataset["Tags"]
 
             print(classification_report(res, res_true))
             print(f"f1-score: {f1_score(res, res_true)}")

@@ -3,8 +3,6 @@ from string import punctuation
 import pandas as pd
 from nltk.stem import WordNetLemmatizer
 
-# TODO: fix bug
-
 
 def remove_punctuation(data: pd.DataFrame) -> pd.DataFrame:
     punctuations_str = punctuation

@@ -6,6 +6,8 @@ import spacy
 from spacy.tokens import Doc
 from spacy.pipeline import EntityRuler
 
+from src.models.NER_lists import cities, countries, female_names, male_names, surnames, organizations
+
 
 from src.preprocessing.preprocessing import prepare_spacy_data
 
@@ -28,7 +30,7 @@ class Rulse_based_model:
             res_list.append(tags_list)
         return res_list
 
-    def _match_tags(self, doc_pred_list: list, tags_true_list: list) -> dict:
+    def _match_tags(self, doc_pred_list, tags_true_list):
         # get dict with the most popular target tag for spacy tags
         target_values = {"O": 0, "B-MISC": 0, "I-MISC": 0, "B-PER": 0,
                          "I-PER": 0, "B-LOC": 0, "I-LOC": 0, "B-ORG": 0, "I-ORG": 0, }
@@ -41,14 +43,13 @@ class Rulse_based_model:
                     tags_dict[tag_pred][tag_true] += 1
                 else:
                     tags_dict[tag_pred] = target_values.copy()
-
         res_dict = {}
         for key, val in tags_dict.items():
             res_dict[key] = max(val, key=val.get)
 
         return res_dict
 
-    def _spacy_pred(self, X) -> list:
+    def _spacy_pred(self, X):
         res_list = []
         for idx, sentence in enumerate(X):
             doc = self._nlp(Doc(self._nlp.vocab, words=sentence))
@@ -56,34 +57,24 @@ class Rulse_based_model:
 
         return res_list
 
-    def _add_custom_rules(self, X, y) -> None:
+    def _add_custom_rules(self, X, y):
         ruler = self._nlp.add_pipe("entity_ruler")
-        locations = set()
-        organizations = set()
-        misc_entities = set()
-        persons = set()
-        for sentance, tags in zip(X, y):
-            for idx, tag in enumerate(tags):
-                if tag == "B-LOC" or tag == "I-LOC":
-                    locations.add(sentance[idx])
-                elif tag == "B-ORG" or tag == "I-ORG":
-                    organizations.add(sentance[idx])
-                elif tag == "B-MISC" or tag == "I-MISC":
-                    misc_entities.add(sentance[idx])
-                elif tag == "B-PER" or tag == "I-PER":
-                    persons.add(sentance[idx])
 
         patterns = [{"label": "LOC", "pattern": [{"LOWER": loc}]}
-                    for loc in locations]
-        patterns += [{"label": "ORG", "pattern": [{"LOWER": org}]}
-                     for org in organizations]
-        patterns += [{"label": "MISC", "pattern": [{"LOWER": misc}]}
-                     for misc in misc_entities]
+                    for loc in cities]
+        patterns += [{"label": "LOC", "pattern": [{"LOWER": loc}]}
+                     for loc in countries]
         patterns += [{"label": "PER", "pattern": [{"LOWER": per}]}
-                     for per in persons]
+                     for per in female_names]
+        patterns += [{"label": "PER", "pattern": [{"LOWER": per}]}
+                     for per in male_names]
+        patterns += [{"label": "PER", "pattern": [{"LOWER": per}]}
+                     for per in surnames]
+        patterns += [{"label": "ORG", "pattern": [{"LOWER": per}]}
+                     for per in organizations]
         ruler.add_patterns(patterns)
 
-    def fit(self, X, y) -> None:
+    def fit(self, X, y):
         if self._is_use_custom_rules:
             self._add_custom_rules(X, y)
         res_list = self._spacy_pred(X)
