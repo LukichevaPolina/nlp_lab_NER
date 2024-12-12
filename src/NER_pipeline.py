@@ -13,14 +13,6 @@ from src.utils.dataset_parser import get_entities
 class Preprocessor(Enum):
     NONE = 1
     REMOVE_PUNCTUATION = 2
-    REMOVE_WHITESPACES = 3
-    REMOVE_ALL = 4
-
-
-class Emdedder(Enum):
-    WORD2VEC_ONEHOT = 1
-    WORD2VEC_LABEL = 2
-    NONE = 3
 
 
 class Algorithm(Enum):
@@ -41,9 +33,6 @@ TARGET2ENUM = {
     "remove-punctuation": Preprocessor.REMOVE_PUNCTUATION,
     "remove-whitespaces": Preprocessor.REMOVE_WHITESPACES,
     "remove-all": Preprocessor.REMOVE_ALL,
-    "word2vec-onehot": Emdedder.WORD2VEC_ONEHOT,
-    "word2vec-onehot": Emdedder.WORD2VEC_LABEL,
-    "emb-none": Emdedder.NONE,
     "train": Mode.TRAIN,
     "eval": Mode.EVAL,
     "infer": Mode.INFER
@@ -86,17 +75,10 @@ class NER_pipeline:
                      self._val_dataset], ["train", "test", "val"])
 
         # preprocessing
-        if self._preprocessor == Preprocessor.REMOVE_PUNCTUATION or \
-           self._preprocessor == Preprocessor.REMOVE_ALL:
+        if self._preprocessor == Preprocessor.REMOVE_PUNCTUATION:
             self._train_dataset = remove_punctuation(self._train_dataset)
             self._test_dataset = remove_punctuation(self._test_dataset)
             self._val_dataset = remove_punctuation(self._val_dataset)
-
-        if self._preprocessor == Preprocessor.REMOVE_WHITESPACES or \
-                self._preprocessor == Preprocessor.REMOVE_ALL:
-            self._train_dataset = remove_whitespaces(self._train_dataset)
-            self._test_dataset = remove_whitespaces(self._test_dataset)
-            self._val_dataset = remove_whitespaces(self._val_dataset)
 
         if self._algorithm == Algorithm.NN:
             self._train_dataset = lemamtization(self._train_dataset)
@@ -108,8 +90,10 @@ class NER_pipeline:
             self.model = Rulse_based_model(is_use_custom_rules=True)
             self.model.fit(
                 self._train_dataset["Sentence"], self._train_dataset["Tags"])
+        elif self._algorithm == Algorithm.NN:
+            raise NotImplementedError(f"Algorithm doesn't supported yet")
         else:
-            raise RuntimeError(f"Algorithm doesn't supported yet")
+            raise RuntimeError(f"Algorithm: {self._algorithm} is not supported")
 
     def eval(self) -> None:
         if self._algorithm == Algorithm.RULE_BASED:
@@ -118,8 +102,10 @@ class NER_pipeline:
 
             print(classification_report(res, res_true))
             print(f"f1-score: {f1_score(res, res_true)}")
+        elif self._algorithm == Algorithm.NN:
+            raise NotImplementedError(f"Algorithm doesn't supported yet")
         else:
-            raise RuntimeError(f"Algorithms doesn't supported yet")
+            raise RuntimeError(f"Algorithm: {self._algorithm} is not supported")
 
     def str2enum(self, target: str) -> Algorithm:
         try:

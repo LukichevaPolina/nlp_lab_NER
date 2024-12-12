@@ -52,7 +52,7 @@ Val:
 Consider removing any unnecessary punctuation marks or special characters unless they carry significant meaning in certain languages.
 
 
-## Rule based models
+## Rule based model
 ### Using Spacy model
 Spacy model returns more tags then we need:
 * PERSON:      People, including fictional.
@@ -102,3 +102,5 @@ Custom rules - addind popular oragizations, names, surnames to rules. It changes
 |weighted avg |     0.52  |    0.63  |    0.57  |   126877 |
 
 **f1-score:** 0.5554045698596066
+
+## Deep Learning model

@@ -52,13 +52,6 @@ def parse_args() -> Dict[str, str]:
         help="the strategy to do preprocess"
     )
     args.add_argument(
-        "--embedder",
-        type=str,
-        default="emb-none",
-        choices=["emb-none", "word2vec-onehot", "word2vec-onehot"],
-        help="the strategy to do preprocess"
-    )
-    args.add_argument(
         "--mode",
         required=True,
         type=str,
@@ -80,7 +73,6 @@ def main() -> None:
         val_dataset_name=args["val_dataset_name"],
         algorithm=args["algorithm"],
         preprocessor=args["preprocessor"],
-        embedder=args["embedder"],
         mode=args["mode"]
     )
 

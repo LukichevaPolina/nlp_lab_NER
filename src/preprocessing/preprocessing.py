@@ -20,18 +20,6 @@ def remove_punctuation(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def remove_whitespaces(data: pd.DataFrame) -> pd.DataFrame:
-    punctuations_str = punctuation
-    for row_idx, row in enumerate(data.itertuples()):
-        sentence = []
-        for idx, token in enumerate(row.Sentence):
-            sentence.append(token.strip())
-
-        data.loc[row_idx, "Sentence"] = sentence
-
-    return data
-
-
 def lemamtization(data: pd.DataFrame) -> pd.DataFrame:
     lemmer = WordNetLemmatizer()
     data["Sentence"] = data["Sentence"].map(
