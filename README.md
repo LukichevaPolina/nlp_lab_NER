@@ -41,10 +41,12 @@ Dataset contains 3 files:
 ![alt text](./plots/tags_distribution_train_O_tag_False.png) | ![alt text](./plots/tags_distribution_test_O_tag_False.png) | ![alt text](./plots/tags_distribution_val_O_tag_False.png)
 
 
-| Train | Test | Val |
-:---------------:|:--------------:|:---------:
-![alt text](./plots/tag_word_position_distribution_train.png) | ![alt text](./plots/tag_word_position_distribution_test.png) | ![alt text](./plots/tag_word_position_distribution_val.png)
-
+Train:
+![alt text](./plots/tag_word_position_distribution_train.png)
+Test:
+![alt text](./plots/tag_word_position_distribution_test.png)
+Val:
+![alt text](./plots/tag_word_position_distribution_val.png)
 
 ## Preprocessing
 Consider removing any unnecessary punctuation marks or special characters unless they carry significant meaning in certain languages.
@@ -87,7 +89,7 @@ We decided to calculate the most popular target tag for every spacy tag and then
 **f1-score:** 0.5433398420918584
 
 ### Add custom rules
-* Cusctom rules - addind popular oragizations, names, surnames to rules.
+* Custom rules - addind popular oragizations, names, surnames to rules. It changes f1-score marginally.
 |             | precision  |  recall | f1-score  | support |
 |--------     | --------   | ------- | --------  |  ------ |
 |         LOC |      0.57  |    0.72 |     0.63  |   43702 |
