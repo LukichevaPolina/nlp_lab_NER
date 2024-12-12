@@ -11,11 +11,23 @@ def remove_punctuation(data: pd.DataFrame) -> pd.DataFrame:
         tags = []
         for idx, token in enumerate(row.Sentence):
             if token not in punctuations_str:
-                sentence.append(token) 
+                sentence.append(token)
                 tags.append(row.Tags[idx])
 
         data.loc[row_idx, "Sentence"] = sentence
         data.loc[row_idx, "Tags"] = tags
+
+    return data
+
+
+def remove_whitespaces(data: pd.DataFrame) -> pd.DataFrame:
+    punctuations_str = punctuation
+    for row_idx, row in enumerate(data.itertuples()):
+        sentence = []
+        for idx, token in enumerate(row.Sentence):
+            sentence.append(token.strip())
+
+        data.loc[row_idx, "Sentence"] = sentence
 
     return data
 

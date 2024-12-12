@@ -5,7 +5,7 @@ from seqeval.metrics import classification_report, f1_score
 
 from src.utils.dataset_parser import parse_dataset
 from src.EDA.EDA import create_plots
-from src.preprocessing.preprocessing import remove_punctuation, lemamtization
+from src.preprocessing.preprocessing import remove_punctuation, remove_whitespaces, lemamtization
 from src.models.rule_based_approach import Rulse_based_model
 from src.utils.dataset_parser import get_entities
 
@@ -13,6 +13,8 @@ from src.utils.dataset_parser import get_entities
 class Preprocessor(Enum):
     NONE = 1
     REMOVE_PUNCTUATION = 2
+    REMOVE_WHITESPACES = 3
+    REMOVE_ALL = 4
 
 
 class Emdedder(Enum):
@@ -37,6 +39,8 @@ TARGET2ENUM = {
     "nn": Algorithm.NN,
     "prepoc-none": Preprocessor.NONE,
     "remove-punctuation": Preprocessor.REMOVE_PUNCTUATION,
+    "remove-whitespaces": Preprocessor.REMOVE_WHITESPACES,
+    "remove-all": Preprocessor.REMOVE_ALL,
     "word2vec-onehot": Emdedder.WORD2VEC_ONEHOT,
     "word2vec-onehot": Emdedder.WORD2VEC_LABEL,
     "emb-none": Emdedder.NONE,
@@ -82,10 +86,17 @@ class NER_pipeline:
                      self._val_dataset], ["train", "test", "val"])
 
         # preprocessing
-        if self._preprocessor == Preprocessor.REMOVE_PUNCTUATION:
+        if self._preprocessor == Preprocessor.REMOVE_PUNCTUATION or \
+           self._preprocessor == Preprocessor.REMOVE_ALL:
             self._train_dataset = remove_punctuation(self._train_dataset)
             self._test_dataset = remove_punctuation(self._test_dataset)
             self._val_dataset = remove_punctuation(self._val_dataset)
+
+        if self._preprocessor == Preprocessor.REMOVE_WHITESPACES or \
+                self._preprocessor == Preprocessor.REMOVE_ALL:
+            self._train_dataset = remove_whitespaces(self._train_dataset)
+            self._test_dataset = remove_whitespaces(self._test_dataset)
+            self._val_dataset = remove_whitespaces(self._val_dataset)
 
         if self._algorithm == Algorithm.NN:
             self._train_dataset = lemamtization(self._train_dataset)
