@@ -8,7 +8,7 @@ from src.utils.dataset_parser import parse_dataset
 
 from src.EDA.EDA import create_plots
 
-from src.preprocessing.preprocessing import remove_punctuation, remove_whitespaces, lemamtization
+from src.preprocessing.preprocessing import remove_punctuation, lemamtization
 
 from src.models.rule_based_approach import Rulse_based_model
 
@@ -17,9 +17,8 @@ from src.utils.dataset_parser import get_entities
 from src.models.class_ner.train import train
 
 from src.utils.rendering import (
-    plot_accuracy_curve, plot_f1_curve, plot_learning_curve, plot_metrics
+    plot_accuracy_curve, plot_f1_curve, plot_learning_curve
 )
-
 
 class Preprocessor(Enum):
     NONE = 1
@@ -38,10 +37,8 @@ TARGET2ENUM = {
     "nn": Algorithm.NN,
     "prepoc-none": Preprocessor.NONE,
     "remove-punctuation": Preprocessor.REMOVE_PUNCTUATION,
-    "remove-whitespaces": Preprocessor.REMOVE_WHITESPACES,
     "train": Mode.TRAIN,
     "eval": Mode.EVAL,
-    "infer": Mode.INFER
 }
 
 ENUM2TARGET = dict(zip(TARGET2ENUM.values(), TARGET2ENUM.keys()))
@@ -53,7 +50,6 @@ class NER_pipeline:
                  test_dataset_name: str,
                  algorithm: str,
                  preprocessor: str,
-                 embedder: str,
                  mode: str,
         ) -> None:
         self._train_dataset = parse_dataset(
@@ -61,7 +57,6 @@ class NER_pipeline:
         self._test_dataset = parse_dataset(dataset_folder + test_dataset_name)
         self._algorithm = self.str2enum(algorithm)
         self._preprocessor = self.str2enum(preprocessor)
-        self._embedder = self.str2enum(embedder)
         self._mode = self.str2enum(mode)
 
         self.model = None
@@ -69,13 +64,14 @@ class NER_pipeline:
 
     def run(self) -> None:
         self.preprocess()
-        self.train()
-        self.eval()
+        if self._mode == Mode.TRAIN:
+            self.train()
+        elif self._mode == Mode.EVAL:
+            self.eval()
 
     def preprocess(self) -> None:
         # crete plots
-        create_plots([self._train_dataset, self._test_dataset,
-                     self._val_dataset], ["train", "test", "val"])
+        create_plots([self._train_dataset, self._test_dataset], ["train", "test"])
 
         # preprocessing
         if self._preprocessor == Preprocessor.REMOVE_PUNCTUATION:
@@ -94,19 +90,17 @@ class NER_pipeline:
         elif self._algorithm == Algorithm.NN:
             train_metrics, val_metrics, train_losses, val_losses = train(chekpoint_save="checkpoints/class_ner.pt", train_dataset=self._train_dataset, test_dataset=self._test_dataset)
             pd.DataFrame(train_metrics).to_csv(
-                f"metrics/train_metrics_{self._metrics_path}.csv")
+                f"metrics/train_metrics.csv")
             pd.DataFrame(val_metrics).to_csv(
-                f"metrics/val_metrics_{self._metrics_path}.csv")
+                f"metrics/val_metrics.csv")
             pd.DataFrame(train_losses).to_csv(
-                f"metrics/train_losses_{self._metrics_path}.csv")
+                f"metrics/train_losses.csv")
             pd.DataFrame(val_losses).to_csv(
-                f"metrics/val_losses_{self._metrics_path}.csv")
+                f"metrics/val_losses.csv")
             plot_learning_curve(
                 train_losses["ce"], val_losses["ce"], name="cnn_learning_curve")
-            plot_accuracy_curve(
-                train_metrics["accuracy"], val_metrics["accuracy"], name="cnn_accuracy_curve")
             plot_f1_curve(
-                train_metrics["f1score"], val_metrics["f1score"], name="cnn_f1_curve")
+                train_metrics["f1"], val_metrics["f1"], name="cnn_f1_curve")
         else:
             raise RuntimeError(f"Algorithm: {self._algorithm} is not supported")
 

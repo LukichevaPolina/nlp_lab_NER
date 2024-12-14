@@ -9,15 +9,14 @@ import numpy as np
 
 from torch import nn
 
-from torcheval.metrics.classification.accuracy import MulticlassAccuracy
-from torcheval.metrics.classification.f1_score import MulticlassF1Score
+from seqeval.metrics import f1_score
 
 SEED = 4200
 random.seed(SEED)
 np.random.seed(SEED)
 torch.manual_seed(SEED)
 
-def train(chekpoint_save, train_dataset, test_dataset, num_epochs=100, batch_size=32, max_sentence_len = 16):
+def train(chekpoint_save, train_dataset, test_dataset, num_epochs=5, batch_size=64, max_sentence_len = 16):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     sentences_train, tags_train = train_dataset["Sentence"], train_dataset["Tags"]
     sentences_test, tags_test = test_dataset["Sentence"], test_dataset["Tags"]
@@ -43,50 +42,65 @@ def train(chekpoint_save, train_dataset, test_dataset, num_epochs=100, batch_siz
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.97048695)
     ce_loss = nn.CrossEntropyLoss().to(device)
     
-    accuracy = MulticlassAccuracy(average="macro", num_classes=7).to(device)
-    f1_score = MulticlassF1Score(average="micro", num_classes=7).to(device)
-
     best_f1score = 0.0
-    train_metrics = {"accuracy": [], "f1score": []}
-    val_metrics = {"accuracy": [], "f1score": []}
+    train_metrics = {"f1": []}
+    val_metrics = {"f1": []}
     train_losses = {"ce": []}
     val_losses = {"ce": []}
     print(f"[INFO] Start training, epochs = {num_epochs}")
     for epoch in range(num_epochs):
         ner_model.train()
-        accuracy.reset()
-        f1_score.reset()
-
+        f1score = []
         celosses = []
         for word_embeddings, tags_embeddings, padding_slice in train_dataloader:
-            print(f"{word_embeddings.shape=}")
-            print(f"{tags_embeddings.shape=}")
+            word_embeddings = word_embeddings.unsqueeze(dim=1).unsqueeze(dim=2)
+            tags_embeddings = tags_embeddings.unsqueeze(dim=1).unsqueeze(dim=2)
+            #print(f"{word_embeddings.shape=}")
+            #print(f"{tags_embeddings.shape=}")
             
             #X = X.unsqueeze(dim=1)
             ner_model.zero_grad()
-            pred = ner_model(word_embeddings)
-            celoss = ce_loss(pred, tags_embeddings)
-            celosses.append(celoss.item())
 
-            celoss.backward()
+            pred = ner_model(word_embeddings)
+            total_celoss = 0
+            splitting_tags = torch.split(tags_embeddings, 1, dim=3)
+            for i, logits in enumerate(pred):
+                # print(f"{logits.squeeze().shape=}")
+                # print(f"{splitting_tags[i].squeeze().shape=}")
+                total_celoss += ce_loss(logits.squeeze(), splitting_tags[i].squeeze())
+
+            total_celoss /= len(pred)
+            #mean_logits = [torch.mean(pred[i], dim=3).unsqueeze(dim=3).float() for i in range(len(pred))]
+            #mean_logits = torch.cat(mean_logits, dim=3)
+            #print(f"{mean_logits.dtype=}")
+            #print(f"{mean_logits.shape=}")
+            #celoss = ce_loss(mean_logits, tags_embeddings)
+            celosses.append(total_celoss.item())
+
+            total_celoss.backward()
             optimizer.step()
-            
-            y_pred = torch.softmax(pred, dim=1).argmax(dim=1)
-            accuracy.update(y_pred, tags_embeddings)
-            f1_score.update(y_pred, tags_embeddings)
-            
-        train_metrics["accuracy"].append(accuracy.compute().item())
-        train_metrics["f1score"].append(f1_score.compute().item())
+
+            y_pred = [torch.softmax(pred[i], dim=3).argmax(dim=3).unsqueeze(dim=3) for i in range(len(pred))]
+            #print(f"{y_pred[0].shape=}")
+            y_pred = torch.cat(y_pred, dim=3)
+            #print(f"{y_pred.shape=}")
+
+            target = tags_embedder.inverse(tags_embeddings.reshape(1, -1).squeeze()).tolist()
+            prediction = tags_embedder.inverse(y_pred.reshape(1, -1).squeeze()).tolist()
+            #(f"{target=}")
+            #print(f"{prediction=}")
+            f1score.append(f1_score([target], [prediction]))
+
+        train_metrics["f1"].append(np.array(f1score).mean())    
         train_losses["ce"].append(np.array(celosses).mean())
 
-        val_loss, val_accuracy, val_f1 = linear_val(ner_model, device, test_dataloader)
-        val_metrics["accuracy"].append(val_accuracy)
-        val_metrics["f1score"].append(val_f1)
+        val_loss, val_f1 = eval(ner_model, device, test_dataloader, tags_embedder)
+        val_metrics["f1"].append(val_f1)
         val_losses["ce"].append(val_loss)
 
-        if epoch % 5 == 0:
+        if epoch % 2 == 0:
             print(f"EPOCH={epoch}/TRAIN")
-            print(f"train_ce_loss={train_losses["ce"][-1]}, val_ce_loss={val_losses['ce'][-1]}, train_f1score={train_metrics['f1score'][-1]}, val_f1score={val_metrics["f1score"][-1]}")
+            print(f"train_ce_loss={train_losses["ce"][-1]}, val_ce_loss={val_losses['ce'][-1]}, train_f1score={train_metrics['f1'][-1]}, val_f1score={val_metrics["f1"][-1]}")
 
         scheduler.step()
 
@@ -97,26 +111,38 @@ def train(chekpoint_save, train_dataset, test_dataset, num_epochs=100, batch_siz
     print(f"[INFO] Training end")
     return train_metrics, val_metrics, train_losses, val_losses
     
-def linear_val(ner_model, device, test_dataloader):
+def eval(ner_model, device, test_dataloader, tags_embedder):
     ner_model.eval()
 
+    f1score = []
     celosses = []
-    ce_loss = nn.CrossEntropyLoss(torch.Tensor([4.0, 5.0, 1.0, 1.0, 16.0, 8, 1.5])).to(device)
-    f1_score = MulticlassF1Score(average="micro", num_classes=7).to(device)
-    accuracy = MulticlassAccuracy(average="macro", num_classes=7).to(device)
-    f1_score.reset()
-    accuracy.reset()
+    ce_loss = nn.CrossEntropyLoss().to(device)    
     with torch.no_grad():
         for word_embeddings, tags_embeddings, padding_slice in test_dataloader:
-            X = X.unsqueeze(dim=1)
-            pred = ner_model(X).squeeze()
+            word_embeddings = word_embeddings.unsqueeze(dim=1).unsqueeze(dim=2)
+            tags_embeddings = tags_embeddings.unsqueeze(dim=1).unsqueeze(dim=2)
 
-            celoss = ce_loss(pred, y)
-            celosses.append(celoss.item())
+            pred = ner_model(word_embeddings)
+            total_celoss = 0
+            splitting_tags = torch.split(tags_embeddings, 1, dim=3)
+            for i, logits in enumerate(pred):
+                # print(f"{logits.squeeze().shape=}")
+                # print(f"{splitting_tags[i].squeeze().shape=}")
+                total_celoss += ce_loss(logits.squeeze(), splitting_tags[i].squeeze())
 
-            y_pred = torch.softmax(pred, dim=1).argmax(dim=1)
-            f1_score.update(y_pred, y)
-            accuracy.update(y_pred, y)
+            total_celoss /= len(pred)
+            celosses.append(total_celoss.item())
+
+            y_pred = [torch.softmax(pred[i], dim=3).argmax(dim=3).unsqueeze(dim=3) for i in range(len(pred))]
+            #print(f"{y_pred[0].shape=}")
+            y_pred = torch.cat(y_pred, dim=3)
+            #print(f"{y_pred.shape=}")
+
+            target = tags_embedder.inverse(tags_embeddings.reshape(1, -1).squeeze()).tolist()
+            prediction = tags_embedder.inverse(y_pred.reshape(1, -1).squeeze()).tolist()
+            #(f"{target=}")
+            #print(f"{prediction=}")
+            f1score.append(f1_score([target], [prediction]))
 
     ner_model.train()
-    return np.array(celosses).mean(), accuracy.compute().item(), f1_score.compute().item()
+    return np.array(celosses).mean(), np.array(f1score).mean()

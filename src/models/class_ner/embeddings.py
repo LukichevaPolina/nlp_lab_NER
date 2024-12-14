@@ -30,3 +30,6 @@ class LabelEmbedder:
 
     def process(self, tag_list):
         return self._target_encoder.transform(tag_list)
+
+    def inverse(self, tag_list):
+        return self._target_encoder.inverse_transform(tag_list)

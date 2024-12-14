@@ -4,7 +4,7 @@ from scipy.sparse import csr_matrix
 import numpy as np
 import torch
 import pandas as pd
-from embeddings import IdfEmbedder, LabelEmbedder
+from src.models.class_ner.embeddings import IdfEmbedder, LabelEmbedder
 from typing import Dict
 
 from torch.utils.data import DataLoader
@@ -28,14 +28,16 @@ class CustomDataset(Dataset):
     
     def __getitem__(self, index):
         sentence, tags, padding_slice = self._new_dataset["Sentence"][index], self._new_dataset["Tags"][index], self._new_dataset["Slice"][index]
-        words_embedding = [self._word2idf[word] if word in list(self._word2idf.keys()) else self._word2idf["<unk>"] for word in sentence]
+        words_embedding = []
+        for word in sentence:
+            try:
+                words_embedding.append(self._word2idf[word])
+            except:
+                words_embedding.append(self._word2idf["<unk>"])
+            
         tags_embedding = self._tags_embedder.process(tags)
-        print(f"{words_embedding.shape=}")
-        print(f"{words_embedding=}")
-        print(f"{tags_embedding.shape=}")
-        print(f"{tags_embedding=}")
 
-        return torch.as_tensor(words_embedding).float(), torch.as_tensor(tags_embedding).long()
+        return torch.as_tensor(words_embedding).float(), torch.as_tensor(tags_embedding).long(), torch.as_tensor(padding_slice).long()
     
 class CustomDatamodule:
     def __init__(
