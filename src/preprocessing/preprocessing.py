@@ -3,7 +3,7 @@ from string import punctuation
 import pandas as pd
 from nltk.stem import WordNetLemmatizer
 
-
+# TODO: make data argument const and not changable
 def remove_punctuation(data: pd.DataFrame) -> pd.DataFrame:
     punctuations_str = punctuation
     for row_idx, row in enumerate(data.itertuples()):
@@ -19,26 +19,14 @@ def remove_punctuation(data: pd.DataFrame) -> pd.DataFrame:
 
     return data
 
-
-def remove_whitespaces(data: pd.DataFrame) -> pd.DataFrame:
-    punctuations_str = punctuation
-    for row_idx, row in enumerate(data.itertuples()):
-        sentence = []
-        for idx, token in enumerate(row.Sentence):
-            sentence.append(token.strip())
-
-        data.loc[row_idx, "Sentence"] = sentence
-
-    return data
-
-
+# TODO: make data argument const and not changable
 def lemamtization(data: pd.DataFrame) -> pd.DataFrame:
     lemmer = WordNetLemmatizer()
     data["Sentence"] = data["Sentence"].map(
         lambda x: [lemmer.lemmatize(item) for item in x])
     return data
 
-
+# TODO: make data argument const and not changable
 def prepare_spacy_data(df: pd.date_range) -> list:
     spacy_data = []
     for sentance, tags in zip(df['Sentence'], df['Tags']):

@@ -52,7 +52,7 @@ Val:
 Consider removing any unnecessary punctuation marks or special characters unless they carry significant meaning in certain languages.
 
 
-## Rule based models
+## Rule based model
 ### Using Spacy model
 Spacy model returns more tags then we need:
 * PERSON:      People, including fictional.
@@ -102,3 +102,12 @@ Custom rules - addind popular oragizations, names, surnames to rules. It changes
 |weighted avg |     0.52  |    0.63  |    0.57  |   126877 |
 
 **f1-score:** 0.5554045698596066
+
+## Deep Learning model
+We use Fully Connected Neural Network with IDF encoder of words. We first create vocabulary of the most frequent words from the corpus, then assign this words its idf index. For target encoder we use label encoder. Our architecture implies to construct more features (500) based on the idf. So the result is very poor, we think it occurs because of: 1) our base encoder is very poor (we need complicated encoder, which take into account the position of words), 2) our architecture is not appropriate for this task (maybe we need to more deep layers, but our hardware is not appropriate for this).
+
+![alt text](./graphs/cnn_learning_curve.png)
+
+![alt text](./graphs/cnn_f1_curve.png)
+
+**f1-score:** 0.0012173130963674447

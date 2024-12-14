@@ -4,3 +4,6 @@ pandas==2.2.3
 seqeval==1.2.2
 spacy==3.8.2
 tqdm==4.66.5
+torch==2.5.1
+torchaudio==2.5.1
+torchvision==0.20.1
