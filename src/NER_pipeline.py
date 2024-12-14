@@ -14,6 +14,13 @@ from src.models.rule_based_approach import Rulse_based_model
 
 from src.utils.dataset_parser import get_entities
 
+from src.models.class_ner.train import train
+
+from src.utils.rendering import (
+    plot_accuracy_curve, plot_f1_curve, plot_learning_curve, plot_metrics
+)
+
+
 class Preprocessor(Enum):
     NONE = 1
     REMOVE_PUNCTUATION = 2
@@ -25,7 +32,6 @@ class Algorithm(Enum):
 class Mode(Enum):
     TRAIN = 1
     EVAL = 2
-    INFER = 3
 
 TARGET2ENUM = {
     "rule-based": Algorithm.RULE_BASED,
@@ -45,22 +51,21 @@ class NER_pipeline:
                  dataset_folder: str,
                  train_dataset_name: str,
                  test_dataset_name: str,
-                 val_dataset_name: str,
                  algorithm: str,
                  preprocessor: str,
                  embedder: str,
                  mode: str,
-                 ) -> None:
+        ) -> None:
         self._train_dataset = parse_dataset(
             dataset_folder + train_dataset_name)
         self._test_dataset = parse_dataset(dataset_folder + test_dataset_name)
-        self._val_dataset = parse_dataset(dataset_folder + val_dataset_name)
         self._algorithm = self.str2enum(algorithm)
         self._preprocessor = self.str2enum(preprocessor)
         self._embedder = self.str2enum(embedder)
         self._mode = self.str2enum(mode)
 
         self.model = None
+        self.dl_model = None
 
     def run(self) -> None:
         self.preprocess()
@@ -76,12 +81,10 @@ class NER_pipeline:
         if self._preprocessor == Preprocessor.REMOVE_PUNCTUATION:
             self._train_dataset = remove_punctuation(self._train_dataset)
             self._test_dataset = remove_punctuation(self._test_dataset)
-            self._val_dataset = remove_punctuation(self._val_dataset)
 
         if self._algorithm == Algorithm.NN:
             self._train_dataset = lemamtization(self._train_dataset)
             self._test_dataset = lemamtization(self._test_dataset)
-            self._val_dataset = lemamtization(self._val_dataset)
 
     def train(self) -> None:
         if self._algorithm == Algorithm.RULE_BASED:
@@ -89,7 +92,21 @@ class NER_pipeline:
             self.model.fit(
                 self._train_dataset["Sentence"], self._train_dataset["Tags"])
         elif self._algorithm == Algorithm.NN:
-            raise NotImplementedError(f"Algorithm doesn't supported yet")
+            train_metrics, val_metrics, train_losses, val_losses = train(chekpoint_save="checkpoints/class_ner.pt", train_dataset=self._train_dataset, test_dataset=self._test_dataset)
+            pd.DataFrame(train_metrics).to_csv(
+                f"metrics/train_metrics_{self._metrics_path}.csv")
+            pd.DataFrame(val_metrics).to_csv(
+                f"metrics/val_metrics_{self._metrics_path}.csv")
+            pd.DataFrame(train_losses).to_csv(
+                f"metrics/train_losses_{self._metrics_path}.csv")
+            pd.DataFrame(val_losses).to_csv(
+                f"metrics/val_losses_{self._metrics_path}.csv")
+            plot_learning_curve(
+                train_losses["ce"], val_losses["ce"], name="cnn_learning_curve")
+            plot_accuracy_curve(
+                train_metrics["accuracy"], val_metrics["accuracy"], name="cnn_accuracy_curve")
+            plot_f1_curve(
+                train_metrics["f1score"], val_metrics["f1score"], name="cnn_f1_curve")
         else:
             raise RuntimeError(f"Algorithm: {self._algorithm} is not supported")
 

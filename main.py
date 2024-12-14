@@ -29,13 +29,6 @@ def parse_args() -> Dict[str, str]:
         help="Name of file with test dataset"
     )
     args.add_argument(
-        "--val_dataset_name",
-        required=False,
-        default="val.conllu",
-        type=str,
-        help="Name of file with val dataset"
-    )
-    args.add_argument(
         "--algorithm",
         required=True,
         type=str,
@@ -70,7 +63,6 @@ def main() -> None:
         dataset_folder=args["dataset_folder"],
         train_dataset_name=args["train_dataset_name"],
         test_dataset_name=args["test_dataset_name"],
-        val_dataset_name=args["val_dataset_name"],
         algorithm=args["algorithm"],
         preprocessor=args["preprocessor"],
         mode=args["mode"]
