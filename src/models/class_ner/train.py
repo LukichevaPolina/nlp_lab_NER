@@ -16,7 +16,7 @@ random.seed(SEED)
 np.random.seed(SEED)
 torch.manual_seed(SEED)
 
-def train(chekpoint_save, train_dataset, test_dataset, num_epochs=5, batch_size=64, max_sentence_len = 16):
+def train(chekpoint_save, train_dataset, test_dataset, num_epochs=100, batch_size=64, max_sentence_len = 16):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     sentences_train, tags_train = train_dataset["Sentence"], train_dataset["Tags"]
     sentences_test, tags_test = test_dataset["Sentence"], test_dataset["Tags"]
